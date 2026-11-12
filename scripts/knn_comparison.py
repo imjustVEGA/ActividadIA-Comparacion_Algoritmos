@@ -1,11 +1,12 @@
 """Compara distancias euclidiana y Manhattan para KNN en el dataset WDBC."""
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -14,6 +15,18 @@ from sklearn.preprocessing import StandardScaler
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "wdbc.data"
 RESULTS_DIR = Path(__file__).resolve().parents[1] / "resultados"
 RANDOM_STATE = 42
+CLASS_NAMES = ["Benigno", "Maligno"]
+
+
+@dataclass
+class KNNResult:
+    """Métricas y predicciones del mejor modelo para una distancia."""
+
+    metric: str
+    k: int
+    estimator: KNeighborsClassifier
+    predictions: np.ndarray
+    accuracy: float
 
 
 def load_data() -> tuple[pd.DataFrame, pd.Series]:
@@ -93,6 +106,43 @@ def plot_accuracy(scores: pd.DataFrame) -> Path:
     return output_path
 
 
+def fit_best_models(
+    scores: pd.DataFrame,
+    X_train: np.ndarray,
+    X_test: np.ndarray,
+    y_train: pd.Series,
+    y_test: pd.Series,
+) -> dict[str, KNNResult]:
+    """Entrena el modelo de mejor accuracy de cada métrica y reporta resultados."""
+    results = {}
+    for metric in ("euclidean", "manhattan"):
+        best_row = (
+            scores[scores["distancia"] == metric]
+            .sort_values(["accuracy", "k"], ascending=[False, True])
+            .iloc[0]
+        )
+        best_k = int(best_row["k"])
+        model = KNeighborsClassifier(n_neighbors=best_k, metric=metric)
+        model.fit(X_train, y_train)
+        predictions = model.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
+        results[metric] = KNNResult(metric, best_k, model, predictions, accuracy)
+
+        print(f"\n===== KNN {metric} (mejor k={best_k}) =====")
+        print(f"Accuracy: {accuracy:.4f}")
+        print(
+            classification_report(
+                y_test,
+                predictions,
+                labels=[0, 1],
+                target_names=CLASS_NAMES,
+                digits=4,
+                zero_division=0,
+            )
+        )
+    return results
+
+
 def main() -> None:
     """Carga, prepara los datos y compara los valores de k."""
     features, labels = load_data()
@@ -106,6 +156,7 @@ def main() -> None:
     print("\nAccuracy por distancia y k:")
     print(scores.pivot(index="k", columns="distancia", values="accuracy").to_string())
     print(f"\nGráfica guardada en: {plot_accuracy(scores)}")
+    fit_best_models(scores, X_train, X_test, y_train, y_test)
 
 
 if __name__ == "__main__":
