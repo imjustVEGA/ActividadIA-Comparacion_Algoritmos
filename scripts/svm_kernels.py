@@ -1,4 +1,12 @@
-"""Compara kernels lineal y RBF para SVM en el dataset Breast Cancer."""
+"""Compara kernels lineal y RBF para SVM en el dataset Breast Cancer.
+
+Script exploratorio de Owen Arturo Bermon Vazquez. La versión oficial (integrada) está en
+la sección 4 de notebooks/comparacion_knn_svm_mlp.ipynb, que usa la MISMA división
+entrenamiento/prueba que KNN y MLP. Ejecutar desde la raíz del repositorio:
+    python scripts/svm_kernels.py
+"""
+
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -84,9 +92,10 @@ def evaluate_best_model(
     display.plot(cmap="Blues", values_format="d")
     display.ax_.set_title(f"Matriz de confusion: kernel {best_kernel}")
     display.figure_.tight_layout()
-    display.figure_.savefig("confusion_matrix_best.png", dpi=150)
+    os.makedirs("resultados", exist_ok=True)
+    display.figure_.savefig("resultados/svm_confusion_matrix_best.png", dpi=150)
     plt.close(display.figure_)
-    print("Figura guardada en confusion_matrix_best.png")
+    print("Figura guardada en resultados/svm_confusion_matrix_best.png")
 
 
 def main() -> None:

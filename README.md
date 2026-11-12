@@ -12,11 +12,12 @@ El objetivo es evaluar el desempeño de los tres algoritmos utilizando la misma 
 
 | Integrante | Rol |
 |---|---|
-| Briceño Omaña Vladimir Ismael| Carga, exploración, preprocesamiento, MLP e integración |
-| Romero Arteaga Azael Fernando| KNN |
-| Bermon Vazquez Owen Arturo| SVM |
-| Herrera Gomez Alison Valeria | Comparación de modelos |
-| Dzul Chi Frida Natalia | Conclusiones |
+| Briceño Omaña Ismael Vladimir (líder) | Carga, exploración, preprocesamiento, MLP, integración y repositorio |
+| Romero Arteaga Azael Fernando | KNN |
+| Bermon Vazquez Owen Arturo | SVM |
+| Chan Puc Mario Santiago | Comparación de modelos y visualización |
+| Dzul Chi Frida Natalia | Análisis y conclusiones |
+| Herrera Gomez Alison Valeria | Análisis, conclusiones y documentación (README) |
 
 ## Dataset
 
@@ -33,6 +34,10 @@ El objetivo es evaluar el desempeño de los tres algoritmos utilizando la misma 
 ├── data/
 │   ├── wdbc.data                        # dataset (sin encabezado)
 │   └── wdbc.names                       # descripción de las variables
+├── scripts/
+│   └── svm_kernels.py                   # exploración de kernels SVM (versión oficial en el notebook)
+├── resultados/
+│   └── svm_confusion_matrix_best.png    # figura generada por scripts/svm_kernels.py
 ├── README.md
 ├── requirements.txt
 └── .gitignore
@@ -53,7 +58,7 @@ El objetivo es evaluar el desempeño de los tres algoritmos utilizando la misma 
 | Modelo | Accuracy | Precision | Recall | F1-score | Errores |
 |---|---|---|---|---|---|
 | KNN | | | | | |
-| SVM | | | | | |
+| SVM | 0.9737 | 1.0000 | 0.9286 | 0.9630 | 3 (3 FN, 0 FP) |
 | MLP | 0.9737 | 1.0000 | 0.9286 | 0.9630 | 3 (3 FN, 0 FP) |
 
 _Completar con la tabla de la sección 6 del notebook._
@@ -68,7 +73,7 @@ _Completar con la tabla de la sección 6 del notebook._
 
 ```bash
 git clone https://github.com/imjustVEGA/ActividadIA-Comparacion_Algoritmos.git
-cd REPOSITORIO
+cd ActividadIA-Comparacion_Algoritmos
 pip install -r requirements.txt
 jupyter notebook notebooks/comparacion_knn_svm_mlp.ipynb
 ```
