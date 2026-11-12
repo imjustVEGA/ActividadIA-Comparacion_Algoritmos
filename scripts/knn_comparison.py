@@ -6,7 +6,13 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    precision_recall_fscore_support,
+)
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -143,6 +149,66 @@ def fit_best_models(
     return results
 
 
+def plot_confusion_matrices(
+    results: dict[str, KNNResult], y_test: pd.Series
+) -> Path:
+    """Imprime y guarda las matrices de confusión de ambos modelos finales."""
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    for ax, metric, label in zip(
+        axes, ("euclidean", "manhattan"), ("Euclidiana", "Manhattan")
+    ):
+        matrix = confusion_matrix(y_test, results[metric].predictions, labels=[0, 1])
+        print(f"\nMatriz de confusión — distancia {label}:")
+        print(matrix)
+        display = ConfusionMatrixDisplay(
+            confusion_matrix=matrix,
+            display_labels=CLASS_NAMES,
+        )
+        display.plot(ax=ax, cmap="Blues", values_format="d", colorbar=False)
+        ax.set_title(f"Distancia {label} (k={results[metric].k})")
+
+    fig.tight_layout()
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = RESULTS_DIR / "knn_confusion_matrices.png"
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+    return output_path
+
+
+def print_summary(results: dict[str, KNNResult], y_test: pd.Series) -> None:
+    """Imprime la tabla comparativa de los dos mejores modelos."""
+    rows = []
+    for metric, result in results.items():
+        precision, recall, f1_score, _ = precision_recall_fscore_support(
+            y_test,
+            result.predictions,
+            average="binary",
+            pos_label=1,
+            zero_division=0,
+        )
+        rows.append(
+            {
+                "Distancia": metric,
+                "Mejor k": result.k,
+                "Accuracy": result.accuracy,
+                "Precision": precision,
+                "Recall": recall,
+                "F1-score": f1_score,
+            }
+        )
+    summary = pd.DataFrame(rows)
+    print("\nTabla comparativa (clase positiva: maligno):")
+    print(
+        summary.to_string(
+            index=False,
+            formatters={
+                column: "{:.4f}".format
+                for column in ("Accuracy", "Precision", "Recall", "F1-score")
+            },
+        )
+    )
+
+
 def main() -> None:
     """Carga, prepara los datos y compara los valores de k."""
     features, labels = load_data()
@@ -156,7 +222,9 @@ def main() -> None:
     print("\nAccuracy por distancia y k:")
     print(scores.pivot(index="k", columns="distancia", values="accuracy").to_string())
     print(f"\nGráfica guardada en: {plot_accuracy(scores)}")
-    fit_best_models(scores, X_train, X_test, y_train, y_test)
+    results = fit_best_models(scores, X_train, X_test, y_train, y_test)
+    print(f"\nMatrices de confusión guardadas en: {plot_confusion_matrices(results, y_test)}")
+    print_summary(results, y_test)
 
 
 if __name__ == "__main__":
