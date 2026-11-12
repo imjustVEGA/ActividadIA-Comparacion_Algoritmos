@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
@@ -11,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "wdbc.data"
+RESULTS_DIR = Path(__file__).resolve().parents[1] / "resultados"
 RANDOM_STATE = 42
 
 
@@ -68,6 +70,29 @@ def search_k_values(
     return pd.DataFrame(rows)
 
 
+def plot_accuracy(scores: pd.DataFrame) -> Path:
+    """Guarda en una sola figura las curvas de accuracy para ambas distancias."""
+    fig, ax = plt.subplots(figsize=(9, 5))
+    for metric, label in (("euclidean", "Euclidiana"), ("manhattan", "Manhattan")):
+        metric_scores = scores[scores["distancia"] == metric]
+        ax.plot(metric_scores["k"], metric_scores["accuracy"], marker="o", label=label)
+
+    ax.set(
+        title="Accuracy de KNN según k",
+        xlabel="Número de vecinos (k)",
+        ylabel="Accuracy",
+        xticks=range(1, 21),
+    )
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    output_path = RESULTS_DIR / "knn_accuracy_vs_k.png"
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+    return output_path
+
+
 def main() -> None:
     """Carga, prepara los datos y compara los valores de k."""
     features, labels = load_data()
@@ -80,6 +105,7 @@ def main() -> None:
     scores = search_k_values(X_train, X_test, y_train, y_test)
     print("\nAccuracy por distancia y k:")
     print(scores.pivot(index="k", columns="distancia", values="accuracy").to_string())
+    print(f"\nGráfica guardada en: {plot_accuracy(scores)}")
 
 
 if __name__ == "__main__":
