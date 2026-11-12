@@ -1,8 +1,10 @@
 # Comparación de algoritmos de aprendizaje supervisado: KNN, SVM y MLP
 
-Actividad práctica: implementar y comparar **K-Nearest Neighbors (KNN)**, **Support Vector Machine (SVM)**
-y una **red neuronal artificial (MLP)** para clasificar tumores de mama como **benignos** o **malignos**,
-usando el mismo conjunto de datos y la misma división de entrenamiento y prueba.
+Este proyecto implementa y compara tres algoritmos de aprendizaje supervisado —K-Nearest Neighbors (KNN), Support Vector Machine (SVM) y Multilayer Perceptron (MLP)— para resolver un problema de clasificación binaria: identificar si un tumor de mama es benigno o maligno.
+
+Se utiliza el conjunto de datos Wisconsin Diagnostic Breast Cancer (WDBC). Cada registro contiene 30 características numéricas calculadas a partir de imágenes digitalizadas de muestras de masas mamarias. La variable objetivo es diagnosis, que contiene las clases B (benigno) y M (maligno).
+
+El objetivo es evaluar el desempeño de los tres algoritmos utilizando la misma preparación de datos y el mismo conjunto de prueba, para que sus resultados puedan compararse de manera justa.
 
 [![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/imjustVEGA/ActividadIA-Comparacion_Algoritmos/blob/main/notebooks/comparacion_knn_svm_mlp.ipynb)
 
@@ -10,11 +12,11 @@ usando el mismo conjunto de datos y la misma división de entrenamiento y prueba
 
 | Integrante | Rol |
 |---|---|
-| _Nombre (líder)_ | Carga, exploración, preprocesamiento, MLP e integración |
-| _Nombre_ | KNN |
-| _Nombre_ | SVM |
-| _Nombre_ | Comparación de modelos |
-| _Nombre_ | Conclusiones |
+| Briceño Omaña Vladimir Ismael| Carga, exploración, preprocesamiento, MLP e integración |
+| Romero Arteaga Azael Fernando| KNN |
+| Bermon Vazquez Owen Arturo| SVM |
+| Herrera Gomez Alison Valeria | Comparación de modelos |
+| Dzul Chi Frida Natalia | Conclusiones |
 
 ## Dataset
 
