@@ -35,8 +35,11 @@ El objetivo es evaluar el desempeño de los tres algoritmos utilizando la misma 
 │   ├── wdbc.data                        # dataset (sin encabezado)
 │   └── wdbc.names                       # descripción de las variables
 ├── scripts/
+│   ├── knn_comparison.py                 # búsqueda y evaluación independiente de KNN
 │   └── svm_kernels.py                   # exploración de kernels SVM (versión oficial en el notebook)
 ├── resultados/
+│   ├── knn_accuracy_vs_k.png             # accuracy de KNN según k y distancia
+│   ├── knn_confusion_matrices.png         # matrices de confusión de KNN
 │   └── svm_confusion_matrix_best.png    # figura generada por scripts/svm_kernels.py
 ├── README.md
 ├── requirements.txt
@@ -62,6 +65,24 @@ El objetivo es evaluar el desempeño de los tres algoritmos utilizando la misma 
 | MLP | 0.9737 | 1.0000 | 0.9286 | 0.9630 | 3 (3 FN, 0 FP) |
 
 _Completar con la tabla de la sección 6 del notebook._
+
+## Ejecución independiente de KNN
+
+El script `scripts/knn_comparison.py` compara las distancias euclidiana y Manhattan con
+`k` de 1 a 20. Divide el dataset local con `test_size=0.2`, `stratify=y` y
+`random_state=42`; ajusta `StandardScaler` únicamente con el conjunto de entrenamiento.
+Selecciona para cada distancia el `k` con mayor accuracy en el conjunto de prueba (en
+caso de empate, elige el menor `k`) y muestra el reporte de clasificación, las matrices
+de confusión y una tabla comparativa.
+
+Desde la raíz del repositorio, ejecútalo con:
+
+```bash
+python scripts/knn_comparison.py
+```
+
+El script guarda `resultados/knn_accuracy_vs_k.png` (ambas curvas en una figura) y
+`resultados/knn_confusion_matrices.png`.
 
 ## Cómo ejecutarlo
 
