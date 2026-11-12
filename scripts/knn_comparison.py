@@ -4,6 +4,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -43,8 +45,31 @@ def prepare_data(
     return X_train_scaled, X_test_scaled, y_train, y_test
 
 
+def search_k_values(
+    X_train: np.ndarray,
+    X_test: np.ndarray,
+    y_train: pd.Series,
+    y_test: pd.Series,
+) -> pd.DataFrame:
+    """Evalúa k=1..20 en el conjunto de prueba para ambas distancias."""
+    rows = []
+    for metric in ("euclidean", "manhattan"):
+        for k in range(1, 21):
+            model = KNeighborsClassifier(n_neighbors=k, metric=metric)
+            model.fit(X_train, y_train)
+            predictions = model.predict(X_test)
+            rows.append(
+                {
+                    "distancia": metric,
+                    "k": k,
+                    "accuracy": accuracy_score(y_test, predictions),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def main() -> None:
-    """Carga, divide y escala los datos para el análisis KNN."""
+    """Carga, prepara los datos y compara los valores de k."""
     features, labels = load_data()
     print(f"Registros: {len(features)}")
     print(f"Características: {features.shape[1]}")
@@ -52,6 +77,9 @@ def main() -> None:
     X_train, X_test, y_train, y_test = prepare_data(features, labels)
     print(f"\nEntrenamiento: {len(y_train)} | Prueba: {len(y_test)}")
     print(f"Features escaladas: {X_train.shape[1]}")
+    scores = search_k_values(X_train, X_test, y_train, y_test)
+    print("\nAccuracy por distancia y k:")
+    print(scores.pivot(index="k", columns="distancia", values="accuracy").to_string())
 
 
 if __name__ == "__main__":
